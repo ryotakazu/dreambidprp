@@ -1,0 +1,194 @@
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { propertiesAPI } from '../../services/api';
+import { getImageUrl } from '../../utils/imageUrl';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+
+function Properties() {
+  const [statusFilter, setStatusFilter] = useState('');
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, error } = useQuery(
+    ['properties', statusFilter],
+    () => propertiesAPI.getAll({ status: statusFilter || undefined, limit: 100 })
+  );
+
+  const deleteMutation = useMutation(
+    (id) => propertiesAPI.delete(id),
+    {
+      onSuccess: () => {
+        toast.success('Property deleted successfully');
+        // Invalidate all property-related queries
+        queryClient.invalidateQueries('properties');
+        queryClient.invalidateQueries(['properties']);
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || 'Failed to delete property');
+      },
+    }
+  );
+
+  const properties = data?.data?.properties || [];
+
+  const handleDelete = (id, title) => {
+    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'upcoming': return 'bg-yellow-100 text-yellow-800';
+      case 'expired': return 'bg-red-100 text-red-800';
+      case 'sold': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-600">Loading properties...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-800">Error loading properties: {error.message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Properties</h1>
+        <Link
+          to="/admin/properties/new"
+          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+        >
+          Add Property
+        </Link>
+      </div>
+
+      {/* Filters */}
+      <div className="mb-6 flex gap-4">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          <option value="">All Status</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="active">Active</option>
+          <option value="expired">Expired</option>
+          <option value="sold">Sold</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      {/* Properties List */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {properties.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <p>No properties found.</p>
+            <Link to="/admin/properties/new" className="text-red-600 hover:text-red-700 mt-2 inline-block">
+              Add your first property
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Property
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Location
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Reserve Price
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Auction Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Views
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {properties.map((property) => (
+                  <tr key={property.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {property.cover_image_url && (
+                          <img
+                            src={getImageUrl(property.cover_image_url)}
+                            alt={property.title}
+                            className="h-12 w-12 rounded object-cover mr-3"
+                          />
+                        )}
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{property.title}</div>
+                          <div className="text-sm text-gray-500">{property.property_type}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{property.city}</div>
+                      <div className="text-sm text-gray-500">{property.state}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      ₹{parseFloat(property.reserve_price).toLocaleString('en-IN')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(property.auction_date).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(property.auction_status)}`}>
+                        {property.auction_status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {property.views_count || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => navigate(`/admin/properties/${property.id}/edit`)}
+                        className="text-red-600 hover:text-red-900 mr-4"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(property.id, property.title)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default Properties;

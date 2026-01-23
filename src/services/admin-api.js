@@ -1,0 +1,72 @@
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add token to requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle response errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Auth API
+export const authAPI = {
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  register: (data) => api.post('/auth/register', data),
+  getMe: () => api.get('/auth/me'),
+};
+
+// Properties API
+export const propertiesAPI = {
+  getAll: (params) => api.get('/properties', { params }),
+  getById: (id) => api.get(`/properties/${id}`),
+  create: (formData) => api.post('/properties', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  update: (id, formData) => api.put(`/properties/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  delete: (id) => api.delete(`/properties/${id}`),
+  uploadPdf: (id, formData) => api.post(`/properties/${id}/pdf`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+};
+
+// Enquiries API
+export const enquiriesAPI = {
+  getAll: (params) => api.get('/enquiries', { params }),
+  create: (data) => api.post('/enquiries', data),
+  updateStatus: (id, status) => api.put(`/enquiries/${id}/status`, { status }),
+};
+
+// Interests API
+export const interestsAPI = {
+  track: (data) => api.post('/interests', data),
+  getStats: (propertyId) => api.get(`/interests/stats/${propertyId}`),
+};
+
+export default api;
+

@@ -72,6 +72,18 @@ async function initializeDatabase() {
       console.log('✅ Seed data inserted');
     } else {
       console.log('✅ Database tables already exist');
+      
+      // Ensure admin user exists with correct password
+      try {
+        await pool.query(
+          `INSERT INTO users (email, password_hash, full_name, role, is_active)
+           VALUES ('admin@dreambid.com', 'admin123', 'Admin User', 'admin', true)
+           ON CONFLICT (email) DO UPDATE SET password_hash = 'admin123'`
+        );
+        console.log('✅ Admin user verified');
+      } catch (err) {
+        console.log('ℹ️  Admin user setup skipped');
+      }
     }
   } catch (error) {
     console.error('❌ Database initialization error:', error.message);

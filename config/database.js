@@ -8,19 +8,32 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // Build connection config
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'dreambid',
-  user: process.env.DB_USER || 'postgres',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-};
+let dbConfig;
 
-// Only add password if it's provided (allows empty string for no password)
-if (process.env.DB_PASSWORD !== undefined) {
-  dbConfig.password = process.env.DB_PASSWORD;
+// Use DATABASE_URL if available (Railway/Render), otherwise use individual env vars
+if (process.env.DATABASE_URL) {
+  dbConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  };
+} else {
+  dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'dreambid',
+    user: process.env.DB_USER || 'postgres',
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  };
+
+  // Only add password if it's provided (allows empty string for no password)
+  if (process.env.DB_PASSWORD !== undefined) {
+    dbConfig.password = process.env.DB_PASSWORD;
+  }
 }
 
 const pool = new Pool(dbConfig);

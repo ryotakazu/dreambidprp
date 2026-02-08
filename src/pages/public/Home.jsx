@@ -265,11 +265,11 @@ function Home() {
                           <p className="text-text-secondary text-xs font-semibold uppercase tracking-wide mb-1">Reserve Price</p>
                           <p className="text-lg md:text-2xl font-bold text-gold">₹{parseFloat(property.reserve_price).toLocaleString('en-IN')}</p>
                         </div>
-                        {property.auction_status === 'active' && (
-                          <div>
+                        <div className="h-5 md:h-6">
+                          {property.auction_status === 'active' && (
                             <p className="text-status-live text-sm font-bold">✓ Bidding Live</p>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex gap-2 md:gap-3 mt-4 md:mt-6 pt-4 md:pt-6 border-t border-midnight-700">

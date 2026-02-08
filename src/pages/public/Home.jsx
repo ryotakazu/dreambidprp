@@ -191,7 +191,7 @@ function Home() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6">
             <button
               onClick={() => setFilters({ status: '', city: '', property_type: '', min_price: '', max_price: '' })}
-              className="px-6 py-3 bg-midnight-800 text-text-nav rounded-btn hover:bg-midnight-700 transition-all text-sm font-medium"
+              className="px-6 py-3 bg-gold text-midnight-950 rounded-btn hover:bg-gold-hover transition-all text-sm font-semibold"
             >
               Clear Filters
             </button>

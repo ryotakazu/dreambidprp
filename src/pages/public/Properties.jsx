@@ -172,7 +172,7 @@ function Properties() {
           </div>
           <button
             onClick={() => setFilters({ status: '', city: '', property_type: '', min_price: '', max_price: '' })}
-            className="px-6 py-3 bg-midnight-800 text-text-nav rounded-btn hover:bg-midnight-700 transition-all text-sm font-medium"
+            className="px-6 py-3 bg-gold text-midnight-950 rounded-btn hover:bg-gold-hover transition-all text-sm font-semibold"
           >
             Clear Filters
           </button>
@@ -200,9 +200,9 @@ function Properties() {
                 <p className="text-text-secondary text-lg">No properties found matching your criteria.</p>
                 <button
                   onClick={() => setFilters({ status: '', city: '', property_type: '', min_price: '', max_price: '' })}
-                  className="mt-4 text-gold hover:text-gold-hover text-sm"
+                  className="mt-4 px-4 py-2 bg-gold text-midnight-950 rounded-btn hover:bg-gold-hover transition-all text-sm font-semibold"
                 >
-                  Clear filters to see all properties
+                  Clear Filters
                 </button>
               </div>
             ) : (

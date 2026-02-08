@@ -5,6 +5,27 @@ import { propertiesAPI } from '../../services/api';
 import { shareProperty } from '../../utils/whatsapp';
 import { getImageUrl } from '../../utils/imageUrl';
 
+// Custom hook for typing effect
+function useTypewriter(text, speed = 50) {
+  const [displayedText, setDisplayedText] = useState('');
+
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < text.length) {
+        setDisplayedText(text.substring(0, index + 1));
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, speed);
+
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return displayedText;
+}
+
 // Custom hook for debouncing
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -30,6 +51,10 @@ function Home() {
     min_price: '',
     max_price: '',
   });
+
+  // Typewriter effect for hero title
+  const heroText = 'Invest in Curated Luxury Real Estate Through Transparent Bidding';
+  const displayedText = useTypewriter(heroText, 30);
 
   // Debounce text inputs (city) to avoid API calls on every keystroke
   const debouncedCity = useDebounce(filters.city, 500);
@@ -81,8 +106,9 @@ function Home() {
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}></div>
         <div className="relative max-w-4xl mx-auto px-4 md:px-16">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 md:mb-8 leading-tight text-text-primary">
-            Invest in Curated<br />Luxury Real Estate<br />Through Transparent Bidding
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 md:mb-8 leading-tight text-text-primary min-h-32 md:min-h-40">
+            {displayedText}
+            <span className={`ml-1 ${displayedText.length === heroText.length ? 'hidden' : 'inline-block w-1 h-12 md:h-16 bg-gold animate-pulse'}`}></span>
           </h1>
           <p className="text-base md:text-lg lg:text-xl text-text-muted mb-8 md:mb-10 max-w-2xl leading-relaxed">
             A premium platform crafted for serious investors to discover, evaluate, and bid on high-value properties with trust and clarity.

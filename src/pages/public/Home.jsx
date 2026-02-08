@@ -254,7 +254,7 @@ function Home() {
                       </span>
                     </div>
                   </div>
-                  <div className="p-4 md:p-6 flex flex-col h-full">
+                  <div className="p-4 md:p-6 flex flex-col">
                     <div className="flex-grow">
                       <h3 className="text-xl md:text-2xl font-bold text-white mb-2 min-h-14 md:min-h-16 line-clamp-2">{property.title}</h3>
                       <p className="text-text-secondary text-xs md:text-sm mb-3">

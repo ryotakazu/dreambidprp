@@ -76,15 +76,15 @@ function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-b from-midnight-950 to-midnight-900 text-white pt-20 pb-24 overflow-hidden">
+      <div className="relative bg-gradient-to-b from-midnight-950 to-midnight-900 text-white pt-12 md:pt-20 pb-16 md:pb-24 overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}></div>
-        <div className="relative max-w-4xl mx-auto px-16">
-          <h1 className="text-7xl font-serif font-bold mb-8 leading-tight text-text-primary">
+        <div className="relative max-w-4xl mx-auto px-4 md:px-16">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 md:mb-8 leading-tight text-text-primary">
             Invest in Curated<br />Luxury Real Estate<br />Through Transparent Bidding
           </h1>
-          <p className="text-xl text-text-muted mb-10 max-w-2xl leading-relaxed">
+          <p className="text-base md:text-lg lg:text-xl text-text-muted mb-8 md:mb-10 max-w-2xl leading-relaxed">
             A premium platform crafted for serious investors to discover, evaluate, and bid on high-value properties with trust and clarity.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
@@ -105,30 +105,30 @@ function Home() {
       </div>
 
       {/* Trust Strip */}
-      <div className="bg-gradient-to-b from-midnight-900 to-midnight-900 border-b border-midnight-700 py-20 px-8">
+      <div className="bg-gradient-to-b from-midnight-900 to-midnight-900 border-b border-midnight-700 py-12 md:py-20 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             <div className="text-center">
-              <p className="text-4xl font-bold text-gold mb-2">100%</p>
-              <p className="text-xl text-text-nav">Verified Listings</p>
+              <p className="text-2xl md:text-4xl font-bold text-gold mb-2">100%</p>
+              <p className="text-base md:text-xl text-text-nav">Verified Listings</p>
             </div>
             <div className="text-center">
-              <p className="text-4xl font-bold text-gold mb-2">Transparent</p>
-              <p className="text-xl text-text-nav">Bidding</p>
+              <p className="text-2xl md:text-4xl font-bold text-gold mb-2">Transparent</p>
+              <p className="text-base md:text-xl text-text-nav">Bidding</p>
             </div>
             <div className="text-center">
-              <p className="text-4xl font-bold text-gold mb-2">Trusted by HNI</p>
-              <p className="text-xl text-text-nav">Investors</p>
+              <p className="text-2xl md:text-4xl font-bold text-gold mb-2">Trusted by HNI</p>
+              <p className="text-base md:text-xl text-text-nav">Investors</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters Section */}
-      <div className="bg-gradient-to-b from-midnight-900 to-midnight-900 px-8 py-16 border-b border-midnight-700">
+      <div className="bg-gradient-to-b from-midnight-900 to-midnight-900 px-4 md:px-8 py-12 md:py-16 border-b border-midnight-700">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-serif font-bold text-white mb-8">Find Properties</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-white mb-6 md:mb-8">Find Properties</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
             <div>
               <label className="label block mb-3">Status</label>
               <select
@@ -210,9 +210,9 @@ function Home() {
       </div>
 
       {/* Featured Properties */}
-      <div className="bg-gradient-to-b from-midnight-900 to-midnight-950 px-8 py-24">
+      <div className="bg-gradient-to-b from-midnight-900 to-midnight-950 px-4 md:px-8 py-12 md:py-24">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-16">Featured Properties</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-10 md:mb-16">Featured Properties</h2>
 
           {properties.length === 0 ? (
             <div className="text-center py-12">
@@ -220,7 +220,7 @@ function Home() {
               <p className="text-text-secondary text-sm mt-2">Check back soon for new listings!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
               {properties.map((property) => {
                 const imageUrl = property.cover_image_url || 
                   (property.images && property.images.length > 0 
@@ -229,7 +229,7 @@ function Home() {
 
                 return (
                 <div key={property.id} className="group card overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                  <div className="relative h-64 overflow-hidden bg-midnight-800">
+                  <div className="relative h-48 md:h-64 overflow-hidden bg-midnight-800">
                     {imageUrl ? (
                       <img
                         src={getImageUrl(imageUrl)}
@@ -254,15 +254,15 @@ function Home() {
                       </span>
                     </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">{property.title}</h3>
-                    <p className="text-text-secondary text-sm mb-6">
+                  <div className="p-4 md:p-6">
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{property.title}</h3>
+                    <p className="text-text-secondary text-xs md:text-sm mb-4 md:mb-6">
                       📍 {property.city}, {property.state} • {property.property_size} sq.ft
                     </p>
-                    <div className="mb-6 space-y-3">
+                    <div className="mb-4 md:mb-6 space-y-2 md:space-y-3">
                       <div>
                         <p className="text-text-secondary text-xs font-semibold uppercase tracking-wide mb-1">Reserve Price</p>
-                        <p className="text-2xl font-bold text-gold">₹{parseFloat(property.reserve_price).toLocaleString('en-IN')}</p>
+                        <p className="text-lg md:text-2xl font-bold text-gold">₹{parseFloat(property.reserve_price).toLocaleString('en-IN')}</p>
                       </div>
                       {property.auction_status === 'active' && (
                         <div>
@@ -270,16 +270,16 @@ function Home() {
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 md:gap-3">
                       <Link
                         to={`/properties/${property.id}`}
-                        className="flex-1 btn-primary text-center text-sm"
+                        className="flex-1 btn-primary text-center text-xs md:text-sm py-3 md:py-4"
                       >
                         View Details
                       </Link>
                       <button
                         onClick={() => shareProperty(property)}
-                        className="px-4 py-4 bg-status-live text-white rounded-btn hover:bg-green-600 transition-all"
+                        className="px-3 md:px-4 py-3 md:py-4 bg-status-live text-white rounded-btn hover:bg-green-600 transition-all"
                         title="Share on WhatsApp"
                       >
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

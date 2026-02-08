@@ -19,14 +19,14 @@ function Navbar() {
 
   return (
     <nav className="bg-gradient-to-b from-midnight-950 to-midnight-900 backdrop-blur-md shadow-dark-elevation sticky top-0 z-50 border-b border-midnight-700">
-      <div className="max-w-7xl mx-auto px-16">
-        <div className="flex justify-between items-center py-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-16">
+        <div className="flex justify-between items-center py-4 md:py-8">
           {/* Logo */}
           <div className="flex items-center">
             <Link 
               to="/" 
               onClick={closeMenu}
-              className="text-2xl font-semibold text-white hover:text-gold transition-all duration-300"
+              className="text-xl md:text-2xl font-semibold text-white hover:text-gold transition-all duration-300"
             >
               DreamBid
             </Link>
@@ -54,7 +54,7 @@ function Navbar() {
               </div>
             </div>
             
-            <Link to="/admin/login" className="inline-flex items-center gap-2 bg-gold text-midnight-950 px-10 py-4 rounded-btn hover:bg-gold-hover transition-all duration-300 font-semibold text-sm">
+            <Link to="/admin/login" className="inline-flex items-center gap-2 bg-gold text-midnight-950 px-6 md:px-10 py-3 md:py-4 rounded-btn hover:bg-gold-hover transition-all duration-300 font-semibold text-xs md:text-sm">
               Entity Login
             </Link>
           </div>

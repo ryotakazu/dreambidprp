@@ -103,14 +103,14 @@ function Properties() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-midnight-900 to-midnight-950">
-      <div className="max-w-6xl mx-auto px-8 py-16">
-        <h1 className="text-5xl font-serif font-bold text-white mb-4">Properties</h1>
-        <p className="text-xl text-text-secondary mb-12">Browse our complete collection of premium auction properties</p>
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-16">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-2 md:mb-4">Properties</h1>
+        <p className="text-base md:text-lg lg:text-xl text-text-secondary mb-8 md:mb-12">Browse our complete collection of premium auction properties</p>
 
         {/* Filters */}
-        <div className="card p-8 mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Filters</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div className="card p-4 md:p-8 mb-8 md:mb-12">
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">Filters</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-6">
             <div>
               <label className="label block mb-3">Status</label>
               <select
@@ -207,7 +207,7 @@ function Properties() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 mb-12">
                   {properties.map((property) => {
                     const imageUrl = property.cover_image_url || 
                       (property.images && property.images.length > 0 
@@ -220,7 +220,7 @@ function Properties() {
                       className="group card overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                     >
                       <Link to={`/properties/${property.id}`} onClick={() => handleView(property.id)}>
-                        <div className="relative h-64 overflow-hidden bg-midnight-800">
+                        <div className="relative h-48 md:h-64 overflow-hidden bg-midnight-800">
                           {imageUrl ? (
                             <img
                               src={getImageUrl(imageUrl)}
@@ -246,23 +246,23 @@ function Properties() {
                           </div>
                         </div>
                       </Link>
-                      <div className="p-6">
+                      <div className="p-4 md:p-6">
                         <Link to={`/properties/${property.id}`} onClick={() => handleView(property.id)}>
-                          <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-gold transition-colors line-clamp-2">
+                          <h3 className="text-lg md:text-2xl font-bold text-white mb-2 group-hover:text-gold transition-colors line-clamp-2">
                             {property.title}
                           </h3>
                         </Link>
-                        <p className="text-text-secondary text-sm mb-4">
+                        <p className="text-text-secondary text-xs md:text-sm mb-4">
                           📍 {property.city}, {property.state}
                           {property.property_size && ` • ${property.property_size} sq.ft`}
                         </p>
                         {property.property_type && (
-                          <p className="text-text-secondary text-sm mb-4">Type: {property.property_type}</p>
+                          <p className="text-text-secondary text-xs md:text-sm mb-4">Type: {property.property_type}</p>
                         )}
-                        <div className="mb-6 space-y-3">
+                        <div className="mb-4 md:mb-6 space-y-2 md:space-y-3">
                           <div>
                             <p className="text-text-secondary text-xs font-semibold uppercase tracking-wide mb-1">Reserve Price</p>
-                            <p className="text-2xl font-bold text-gold">
+                            <p className="text-lg md:text-2xl font-bold text-gold">
                               ₹{parseFloat(property.reserve_price).toLocaleString('en-IN')}
                             </p>
                           </div>
@@ -272,11 +272,11 @@ function Properties() {
                             </div>
                           )}
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-2 md:gap-3">
                           <Link
                             to={`/properties/${property.id}`}
                             onClick={() => handleView(property.id)}
-                            className="flex-1 btn-primary text-center text-sm"
+                            className="flex-1 btn-primary text-center text-xs md:text-sm py-3 md:py-4"
                           >
                             View Details
                           </Link>
@@ -285,7 +285,7 @@ function Properties() {
                               shareProperty(property);
                               interestsAPI.track({ property_id: property.id, interest_type: 'share' });
                             }}
-                            className="px-4 py-4 bg-status-live text-white rounded-btn hover:bg-green-600 transition-all"
+                            className="px-3 md:px-4 py-3 md:py-4 bg-status-live text-white rounded-btn hover:bg-green-600 transition-all"
                             title="Share on WhatsApp"
                           >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

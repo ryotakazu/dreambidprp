@@ -103,12 +103,12 @@ function Home() {
 
   return (
     <div>
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-b from-midnight-950 to-midnight-900 text-white pt-12 md:pt-20 pb-16 md:pb-24 overflow-hidden">
+      {/* Hero Section with Overlaid Search Bar */}
+      <div className="relative bg-gradient-to-b from-midnight-950 to-midnight-900 text-white pt-12 md:pt-20 pb-32 md:pb-48 overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}></div>
-        <div className="relative max-w-4xl mx-auto px-4 md:px-16">
+        <div className="relative max-w-4xl mx-auto px-4 md:px-16 mb-12">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 md:mb-8 leading-tight text-text-primary min-h-32 md:min-h-40">
             {displayedText}
             <span className={`ml-1 ${displayedText.length === heroText.length ? 'hidden' : 'inline-block w-1 h-12 md:h-16 bg-gold animate-pulse'}`}></span>
@@ -131,72 +131,63 @@ function Home() {
             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Filters Section - Moved to Hero */}
-      <div className="bg-gradient-to-b from-midnight-900 to-midnight-900 px-4 md:px-8 py-12 md:py-16 border-b border-midnight-700">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-            <div>
-              <label className="label block mb-3">Search Locality, City or State</label>
-              <input
-                type="text"
-                value={filters.city}
-                onChange={(e) => handleFilterChange('city', e.target.value)}
-                placeholder="Search"
-                className="input-field text-sm"
-              />
+        {/* Search Bar Overlaid on Banner */}
+        <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 px-4 md:px-8">
+          <div className="max-w-6xl mx-auto bg-white rounded-card p-6 md:p-8 shadow-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="md:col-span-1">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Search Locality, City or State</label>
+                <input
+                  type="text"
+                  value={filters.city}
+                  onChange={(e) => handleFilterChange('city', e.target.value)}
+                  placeholder="Search"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
+                />
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Budget</label>
+                <select
+                  value={filters.min_price}
+                  onChange={(e) => handleFilterChange('min_price', e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
+                >
+                  <option value="">- Select from drop down -</option>
+                  <option value="0">Under 20 Lakhs</option>
+                  <option value="2000000">20-40 Lakhs</option>
+                  <option value="4000000">40-60 Lakhs</option>
+                  <option value="6000000">60 Lakhs - 1 Crore</option>
+                  <option value="10000000">1-2 Crores</option>
+                  <option value="20000000">2-5 Crores</option>
+                  <option value="50000000">Above 5 Crores</option>
+                </select>
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Property Type</label>
+                <select
+                  value={filters.property_type}
+                  onChange={(e) => handleFilterChange('property_type', e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
+                >
+                  <option value="">- Select from drop down -</option>
+                  <option value="house">House</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="land">Land</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="villa">Villa</option>
+                </select>
+              </div>
+              <div className="md:col-span-1 flex items-end">
+                <Link
+                  to="/properties"
+                  state={{ filters: filters }}
+                  className="w-full px-6 py-3 bg-gold text-midnight-950 rounded-btn hover:bg-gold-hover focus:bg-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 active:bg-gold transition-all text-base font-semibold shadow-md hover:shadow-lg text-center"
+                >
+                  Search
+                </Link>
+              </div>
             </div>
-            <div>
-              <label className="label block mb-3">Budget</label>
-              <select
-                value={filters.min_price}
-                onChange={(e) => handleFilterChange('min_price', e.target.value)}
-                className="input-field text-sm"
-              >
-                <option value="">- Select from drop down -</option>
-                <option value="0">Under 20 Lakhs</option>
-                <option value="2000000">20-40 Lakhs</option>
-                <option value="4000000">40-60 Lakhs</option>
-                <option value="6000000">60 Lakhs - 1 Crore</option>
-                <option value="10000000">1-2 Crores</option>
-                <option value="20000000">2-5 Crores</option>
-                <option value="50000000">Above 5 Crores</option>
-              </select>
-            </div>
-            <div>
-              <label className="label block mb-3">Property Type</label>
-              <select
-                value={filters.property_type}
-                onChange={(e) => handleFilterChange('property_type', e.target.value)}
-                className="input-field text-sm"
-              >
-                <option value="">- Select from drop down -</option>
-                <option value="house">House</option>
-                <option value="apartment">Apartment</option>
-                <option value="land">Land</option>
-                <option value="commercial">Commercial</option>
-                <option value="villa">Villa</option>
-              </select>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6">
-            <button
-              onClick={() => setFilters({ status: '', city: '', property_type: '', min_price: '', max_price: '' })}
-              className="px-6 py-3 bg-gold text-midnight-950 rounded-btn hover:bg-gold-hover focus:bg-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-midnight-900 active:bg-gold transition-all text-sm font-semibold shadow-md hover:shadow-lg"
-            >
-              Clear Filters
-            </button>
-            <Link
-              to="/properties"
-              state={{ filters: filters }}
-              className="btn-primary inline-flex items-center justify-center gap-2"
-            >
-              View All Results
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
           </div>
         </div>
       </div>

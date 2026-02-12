@@ -58,6 +58,12 @@ router.get('/', [
   }),
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 1000 }), // Increased max for dashboard
+  query('sort_by').optional().custom((value) => {
+    if (!value || ['created_at', 'reserve_price', 'auction_date'].includes(value)) {
+      return true;
+    }
+    throw new Error('Invalid sort_by value');
+  }),
 ], async (req, res) => {
   try {
     await updateAuctionStatus(); // Update status before fetching
@@ -73,6 +79,7 @@ router.get('/', [
       property_type,
       min_price,
       max_price,
+      sort_by,
       page = 1,
       limit = 20
     } = req.query;
@@ -126,9 +133,18 @@ router.get('/', [
     const countResult = await pool.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
 
-    // Add pagination - Sort by application_date in descending order
+    // Add pagination with sorting
+    let orderBy = 'created_at DESC';
+    if (sort_by === 'reserve_price') {
+      orderBy = 'reserve_price ASC';
+    } else if (sort_by === 'reserve_price_desc') {
+      orderBy = 'reserve_price DESC';
+    } else if (sort_by === 'auction_date') {
+      orderBy = 'auction_date ASC';
+    }
+    
     paramCount++;
-    query += ` ORDER BY COALESCE(application_date, created_at) DESC LIMIT $${paramCount}`;
+    query += ` ORDER BY ${orderBy} LIMIT $${paramCount}`;
     params.push(limit);
     
     paramCount++;

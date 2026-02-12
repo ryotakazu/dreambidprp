@@ -30,7 +30,7 @@ function Properties() {
     property_type: '',
     budget: '',
   });
-  const [sortBy, setSortBy] = useState('application_date');
+  const [sortBy, setSortBy] = useState('auction_date');
   const [page, setPage] = useState(1);
   const limit = 12;
 
@@ -177,7 +177,7 @@ function Properties() {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="px-3 py-2 bg-midnight-800 border border-midnight-700 rounded-input text-sm focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition text-text-primary"
                 >
-                  <option value="application_date" className="bg-midnight-800 text-text-primary">Auctions Closing Soon</option>
+                  <option value="auction_date" className="bg-midnight-800 text-text-primary">Auctions Closing Soon</option>
                   <option value="reserve_price" className="bg-midnight-800 text-text-primary">Price: Low to High</option>
                   <option value="reserve_price_desc" className="bg-midnight-800 text-text-primary">Price: High to Low</option>
                 </select>

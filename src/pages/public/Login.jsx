@@ -60,7 +60,10 @@ function Login() {
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      await login({
+        email: formData.email,
+        password: formData.password
+      });
       toast.success('Logged in successfully!');
       navigate('/');
     } catch (error) {

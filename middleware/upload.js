@@ -41,7 +41,7 @@ const fileFilter = (req, file, cb) => {
   const allowedImageTypes = /jpeg|jpg|png|gif|webp/;
   const allowedPdfTypes = /pdf/;
   
-  if (file.fieldname === 'images' || file.fieldname === 'image' || file.fieldname === 'cover_image') {
+  if (file.fieldname === 'images' || file.fieldname === 'image' || file.fieldname === 'cover_image' || file.fieldname === 'photo') {
     if (allowedImageTypes.test(path.extname(file.originalname).toLowerCase())) {
       cb(null, true);
     } else {

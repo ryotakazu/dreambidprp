@@ -14,7 +14,7 @@ class User {
   // Find user by id
   static async findById(id) {
     const result = await pool.query(
-      'SELECT id, email, full_name, phone, role, is_active, created_at FROM users WHERE id = $1',
+      'SELECT id, email, full_name, phone, profile_photo, role, is_active, created_at FROM users WHERE id = $1',
       [id]
     );
     return result.rows[0];
@@ -51,7 +51,7 @@ class User {
 
   // Update user
   static async update(id, updates) {
-    const { full_name, phone, role, is_active } = updates;
+    const { full_name, phone, role, is_active, profile_photo } = updates;
     
     const result = await pool.query(
       `UPDATE users 
@@ -59,10 +59,11 @@ class User {
            phone = COALESCE($3, phone),
            role = COALESCE($4, role),
            is_active = COALESCE($5, is_active),
+           profile_photo = COALESCE($6, profile_photo),
            updated_at = NOW()
        WHERE id = $1
-       RETURNING id, email, full_name, phone, role, is_active, updated_at`,
-      [id, full_name, phone, role, is_active]
+       RETURNING id, email, full_name, phone, profile_photo, role, is_active, updated_at`,
+      [id, full_name, phone, role, is_active, profile_photo]
     );
 
     return result.rows[0];
@@ -82,6 +83,11 @@ class User {
     );
 
     return result.rows[0];
+  }
+
+  // Update password (alias for changePassword)
+  static async updatePassword(id, newPassword) {
+    return this.changePassword(id, newPassword);
   }
 
   // Get all users (admin only)

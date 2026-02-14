@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import ProfileDropdown from './ProfileDropdown';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -63,14 +66,20 @@ function Navbar() {
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <Link to="/login" className="text-text-nav hover:text-gold px-4 py-2 rounded-lg transition-colors font-medium text-sm">
-                Sign In
-              </Link>
-              <Link to="/signup" className="inline-flex items-center gap-2 bg-gold text-midnight-950 px-6 md:px-10 py-3 md:py-4 rounded-btn hover:bg-gold-hover transition-all duration-300 font-semibold text-xs md:text-sm">
-                Sign Up
-              </Link>
-            </div>
+            {isAuthenticated && user ? (
+              <div className="flex items-center gap-4">
+                <ProfileDropdown user={user} />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link to="/login" className="text-text-nav hover:text-gold px-4 py-2 rounded-lg transition-colors font-medium text-sm">
+                  Sign In
+                </Link>
+                <Link to="/signup" className="inline-flex items-center gap-2 bg-gold text-midnight-950 px-6 md:px-10 py-3 md:py-4 rounded-btn hover:bg-gold-hover transition-all duration-300 font-semibold text-xs md:text-sm">
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -126,20 +135,48 @@ function Navbar() {
               >
                 Contact Us
               </Link>
-              <Link
-                to="/login"
-                onClick={() => setMenuOpen(false)}
-                className="text-text-nav hover:text-gold hover:bg-midnight-800 block px-4 py-3 rounded-btn text-base font-medium transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/signup"
-                onClick={() => setMenuOpen(false)}
-                className="inline-flex items-center gap-2 bg-gold text-midnight-950 px-4 py-3 rounded-btn text-base font-semibold hover:bg-gold-hover transition-all duration-300 w-full justify-center"
-              >
-                Sign Up
-              </Link>
+              {isAuthenticated && user ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMenuOpen(false)}
+                    className="text-text-nav hover:text-gold hover:bg-midnight-800 block px-4 py-3 rounded-btn text-base font-medium transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="text-text-nav hover:text-gold hover:bg-midnight-800 block px-4 py-3 rounded-btn text-base font-medium transition-colors"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className="text-text-nav hover:text-gold hover:bg-midnight-800 block px-4 py-3 rounded-btn text-base font-medium transition-colors"
+                  >
+                    Settings
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="text-text-nav hover:text-gold hover:bg-midnight-800 block px-4 py-3 rounded-btn text-base font-medium transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setMenuOpen(false)}
+                    className="inline-flex items-center gap-2 bg-gold text-midnight-950 px-4 py-3 rounded-btn text-base font-semibold hover:bg-gold-hover transition-all duration-300 w-full justify-center"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
               <Link
                 to="/admin/login"
                 onClick={() => setMenuOpen(false)}

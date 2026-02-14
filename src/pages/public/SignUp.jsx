@@ -104,19 +104,22 @@ function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-midnight-950 to-midnight-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-midnight-800 rounded-lg shadow-2xl p-8 border border-midnight-700">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-          <p className="text-gray-600">Join DreamBid and start exploring properties</p>
+          <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg mx-auto mb-4">
+            <span className="text-white font-bold text-xl">D</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
+          <p className="text-text-nav">Join DreamBid and start exploring properties</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Full Name */}
           <div>
-            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="full_name" className="block text-sm font-medium text-text-primary mb-1">
               Full Name
             </label>
             <input
@@ -126,18 +129,18 @@ function SignUp() {
               value={formData.full_name}
               onChange={handleInputChange}
               placeholder="John Doe"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.full_name ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-midnight-700 text-white placeholder-text-muted ${
+                errors.full_name ? 'border-red-500' : 'border-midnight-600'
               }`}
             />
             {errors.full_name && (
-              <p className="text-red-500 text-sm mt-1">{errors.full_name}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.full_name}</p>
             )}
           </div>
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-1">
               Email Address
             </label>
             <input
@@ -147,19 +150,19 @@ function SignUp() {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="your@email.com"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-midnight-700 text-white placeholder-text-muted ${
+                errors.email ? 'border-red-500' : 'border-midnight-600'
               }`}
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 
           {/* Phone (Optional) */}
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number <span className="text-gray-500">(Optional)</span>
+            <label htmlFor="phone" className="block text-sm font-medium text-text-primary mb-1">
+              Phone Number <span className="text-text-muted">(Optional)</span>
             </label>
             <input
               type="tel"
@@ -168,18 +171,18 @@ function SignUp() {
               value={formData.phone}
               onChange={handleInputChange}
               placeholder="+1 (555) 000-0000"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-midnight-700 text-white placeholder-text-muted ${
+                errors.phone ? 'border-red-500' : 'border-midnight-600'
               }`}
             />
             {errors.phone && (
-              <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
             )}
           </div>
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-1">
               Password
             </label>
             <div className="relative">
@@ -190,14 +193,14 @@ function SignUp() {
                 value={formData.password}
                 onChange={handleInputChange}
                 placeholder="At least 8 characters"
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-midnight-700 text-white placeholder-text-muted ${
+                  errors.password ? 'border-red-500' : 'border-midnight-600'
                 }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-gray-600 hover:text-gray-800"
+                className="absolute right-3 top-2.5 text-text-muted hover:text-text-nav"
               >
                 {showPassword ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,13 +215,13 @@ function SignUp() {
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.password}</p>
             )}
           </div>
 
           {/* Confirm Password */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary mb-1">
               Confirm Password
             </label>
             <input
@@ -228,12 +231,12 @@ function SignUp() {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               placeholder="Re-enter your password"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-midnight-700 text-white placeholder-text-muted ${
+                errors.confirmPassword ? 'border-red-500' : 'border-midnight-600'
               }`}
             />
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>
             )}
           </div>
 
@@ -241,7 +244,7 @@ function SignUp() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200 disabled:bg-gray-400"
+            className="w-full bg-gold hover:bg-gold-hover text-midnight-950 font-semibold py-2 rounded-lg transition duration-200 disabled:bg-text-muted disabled:text-midnight-950"
           >
             {isLoading ? 'Creating Account...' : 'Create Account'}
           </button>
@@ -250,28 +253,28 @@ function SignUp() {
         {/* Divider */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-midnight-700"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Already have an account?</span>
+            <span className="px-2 bg-midnight-800 text-text-nav">Already have an account?</span>
           </div>
         </div>
 
         {/* Login Link */}
         <p className="text-center">
-          <Link to="/admin/login" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link to="/login" className="text-gold hover:text-gold-hover font-medium">
             Sign In
           </Link>
         </p>
 
         {/* Footer */}
-        <p className="text-center text-xs text-gray-500 mt-6">
+        <p className="text-center text-xs text-text-muted mt-6">
           By creating an account, you agree to our{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700">
+          <a href="#" className="text-gold hover:text-gold-hover">
             Terms of Service
           </a>{' '}
           and{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700">
+          <a href="#" className="text-gold hover:text-gold-hover">
             Privacy Policy
           </a>
         </p>

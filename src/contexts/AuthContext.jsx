@@ -214,6 +214,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Fetch current user data
+  const fetchUser = async () => {
+    try {
+      dispatch({ type: SET_LOADING, payload: true });
+      const response = await api.get('/user/me');
+      dispatch({
+        type: AUTH_SUCCESS,
+        payload: {
+          user: response.data,
+          token: state.token,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+      throw error;
+    } finally {
+      dispatch({ type: SET_LOADING, payload: false });
+    }
+  };
+
   // Change password function
   const changePassword = async (currentPassword, newPassword) => {
     try {
@@ -250,6 +271,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    fetchUser,
     changePassword,
     verifyToken,
     isAdmin,

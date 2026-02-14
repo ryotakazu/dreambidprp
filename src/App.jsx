@@ -17,6 +17,9 @@ import Register from './pages/public/Register';
 import Contact from './pages/public/Contact';
 import SignUp from './pages/public/SignUp';
 import PublicLogin from './pages/public/Login';
+import UserDashboard from './pages/public/Dashboard';
+import UserProfile from './pages/public/Profile';
+import UserSettings from './pages/public/Settings';
 
 // Admin Pages
 import AdminLogin from './pages/admin/Login';
@@ -55,6 +58,11 @@ function App() {
                 <Route path="contact" element={<Contact />} />
                 <Route path="signup" element={<SignUp />} />
                 <Route path="login" element={<PublicLogin />} />
+                
+                {/* Protected User Routes */}
+                <Route path="dashboard" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
+                <Route path="profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+                <Route path="settings" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
               </Route>
 
               {/* Admin Login */}

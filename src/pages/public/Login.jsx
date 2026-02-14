@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [loginType, setLoginType] = useState('user'); // 'user' or 'admin'
   
   const [formData, setFormData] = useState({
     email: '',
@@ -60,12 +62,36 @@ function Login() {
     setIsLoading(true);
 
     try {
-      await login({
-        email: formData.email,
-        password: formData.password
-      });
-      toast.success('Logged in successfully!');
-      navigate('/');
+      if (loginType === 'admin') {
+        // Admin login
+        const response = await api.post('/auth/login', {
+          email: formData.email,
+          password: formData.password
+        });
+
+        if (response.data.user?.role !== 'admin' && response.data.user?.role !== 'staff') {
+          toast.error('This account does not have admin privileges');
+          setErrors(prev => ({
+            ...prev,
+            email: 'Admin account required'
+          }));
+          return;
+        }
+
+        // Store token and redirect to admin dashboard
+        localStorage.setItem('token', response.data.token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        toast.success('Admin logged in successfully!');
+        navigate('/admin/dashboard');
+      } else {
+        // User login
+        await login({
+          email: formData.email,
+          password: formData.password
+        });
+        toast.success('Logged in successfully!');
+        navigate('/');
+      }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
       toast.error(errorMessage);
@@ -82,19 +108,48 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-midnight-950 to-midnight-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-midnight-800 rounded-lg shadow-2xl p-8 border border-midnight-700">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Sign in to your DreamBid account</p>
+          <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg mx-auto mb-4">
+            <span className="text-white font-bold text-xl">D</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+          <p className="text-text-nav">Sign in to your DreamBid account</p>
+        </div>
+
+        {/* Login Type Toggle */}
+        <div className="flex bg-midnight-700 rounded-lg p-1 mb-6">
+          <button
+            type="button"
+            onClick={() => setLoginType('user')}
+            className={`flex-1 py-2 rounded font-medium transition-colors text-sm ${
+              loginType === 'user'
+                ? 'bg-gold text-midnight-950'
+                : 'text-text-nav hover:text-white'
+            }`}
+          >
+            User Login
+          </button>
+          <button
+            type="button"
+            onClick={() => setLoginType('admin')}
+            className={`flex-1 py-2 rounded font-medium transition-colors text-sm ${
+              loginType === 'admin'
+                ? 'bg-gold text-midnight-950'
+                : 'text-text-nav hover:text-white'
+            }`}
+          >
+            Entity Login
+          </button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-1">
               Email Address
             </label>
             <input
@@ -104,22 +159,22 @@ function Login() {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="your@email.com"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-midnight-700 text-white placeholder-text-muted ${
+                errors.email ? 'border-red-500' : 'border-midnight-600'
               }`}
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 
           {/* Password */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-text-primary">
                 Password
               </label>
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-700">
+              <a href="#" className="text-sm text-gold hover:text-gold-hover">
                 Forgot password?
               </a>
             </div>
@@ -131,14 +186,14 @@ function Login() {
                 value={formData.password}
                 onChange={handleInputChange}
                 placeholder="Enter your password"
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-midnight-700 text-white placeholder-text-muted ${
+                  errors.password ? 'border-red-500' : 'border-midnight-600'
                 }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-gray-600 hover:text-gray-800"
+                className="absolute right-3 top-2.5 text-text-muted hover:text-text-nav"
               >
                 {showPassword ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +208,7 @@ function Login() {
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.password}</p>
             )}
           </div>
 
@@ -161,7 +216,7 @@ function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200 disabled:bg-gray-400"
+            className="w-full bg-gold hover:bg-gold-hover text-midnight-950 font-semibold py-2 rounded-lg transition duration-200 disabled:bg-text-muted disabled:text-midnight-950"
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
@@ -170,28 +225,28 @@ function Login() {
         {/* Divider */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-midnight-700"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Don't have an account?</span>
+            <span className="px-2 bg-midnight-800 text-text-nav">Don't have an account?</span>
           </div>
         </div>
 
         {/* Signup Link */}
         <p className="text-center">
-          <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link to="/signup" className="text-gold hover:text-gold-hover font-medium">
             Create Account
           </Link>
         </p>
 
         {/* Footer */}
-        <p className="text-center text-xs text-gray-500 mt-6">
+        <p className="text-center text-xs text-text-muted mt-6">
           By signing in, you agree to our{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700">
+          <a href="#" className="text-gold hover:text-gold-hover">
             Terms of Service
           </a>{' '}
           and{' '}
-          <a href="#" className="text-blue-600 hover:text-blue-700">
+          <a href="#" className="text-gold hover:text-gold-hover">
             Privacy Policy
           </a>
         </p>

@@ -11,6 +11,7 @@ import CleanupService from './services/CleanupService.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
 import activityRoutes from './routes/activity.js';
 import propertyRoutes from './routes/properties.js';
 import enquiryRoutes from './routes/enquiries.js';
@@ -114,6 +115,7 @@ CleanupService.initSchedules();
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/enquiries', enquiryRoutes);

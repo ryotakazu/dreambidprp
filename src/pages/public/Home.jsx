@@ -131,46 +131,55 @@ function Home() {
             </Link>
           </div>
         </div>
+      </div>
 
-        {/* Search Bar Overlaid on Banner */}
-        <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 px-4 md:px-8">
-          <div className="max-w-6xl mx-auto bg-white rounded-card p-6 md:p-8 shadow-2xl">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-              <div className="md:col-span-1">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Search Locality, City or State</label>
+      {/* Search Bar Section */}
+      <div className="relative -mt-20 sm:-mt-24 md:-mt-32 px-4 sm:px-6 md:px-8 pb-0 z-10">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 p-0">
+              {/* Search Locality Input */}
+              <div className="border-b md:border-b-0 md:border-r border-gray-200 p-6">
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">Search Locality, City or State</label>
                 <input
                   type="text"
                   value={filters.city}
                   onChange={(e) => handleFilterChange('city', e.target.value)}
-                  placeholder="Search"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
+                  placeholder="Enter location"
+                  className="w-full px-4 py-3 bg-white border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-gold transition"
                 />
               </div>
-              <div className="md:col-span-1">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Budget</label>
+
+              {/* Budget Dropdown */}
+              <div className="border-b md:border-b-0 md:border-r border-gray-200 p-6">
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">Budget</label>
                 <select
                   value={filters.min_price}
                   onChange={(e) => handleFilterChange('min_price', e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-3 bg-white border-b-2 border-gray-300 text-gray-900 text-sm focus:outline-none focus:border-gold transition appearance-none cursor-pointer"
+                  style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '36px'}}
                 >
-                  <option value="">- Select from drop down -</option>
-                  <option value="0">Under 20 Lakhs</option>
-                  <option value="2000000">20-40 Lakhs</option>
-                  <option value="4000000">40-60 Lakhs</option>
-                  <option value="6000000">60 Lakhs - 1 Crore</option>
-                  <option value="10000000">1-2 Crores</option>
-                  <option value="20000000">2-5 Crores</option>
-                  <option value="50000000">Above 5 Crores</option>
+                  <option value="">- Select from dropdown -</option>
+                  <option value="0">Under 20L</option>
+                  <option value="2000000">20-40L</option>
+                  <option value="4000000">40-60L</option>
+                  <option value="6000000">60L-1Cr</option>
+                  <option value="10000000">1-2Cr</option>
+                  <option value="20000000">2-5Cr</option>
+                  <option value="50000000">Above 5Cr</option>
                 </select>
               </div>
-              <div className="md:col-span-1">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Property Type</label>
+
+              {/* Property Type Dropdown */}
+              <div className="border-b md:border-b-0 md:border-r border-gray-200 p-6">
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">Property Type</label>
                 <select
                   value={filters.property_type}
                   onChange={(e) => handleFilterChange('property_type', e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-3 bg-white border-b-2 border-gray-300 text-gray-900 text-sm focus:outline-none focus:border-gold transition appearance-none cursor-pointer"
+                  style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '36px'}}
                 >
-                  <option value="">- Select from drop down -</option>
+                  <option value="">- Select from dropdown -</option>
                   <option value="house">House</option>
                   <option value="apartment">Apartment</option>
                   <option value="land">Land</option>
@@ -178,11 +187,13 @@ function Home() {
                   <option value="villa">Villa</option>
                 </select>
               </div>
-              <div className="md:col-span-1 flex items-end">
+
+              {/* Search Button */}
+              <div className="p-6 flex items-end">
                 <Link
                   to="/properties"
                   state={{ filters: filters }}
-                  className="w-full px-6 py-3 bg-gold text-midnight-950 rounded-btn hover:bg-gold-hover focus:bg-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 active:bg-gold transition-all text-base font-semibold shadow-md hover:shadow-lg text-center"
+                  className="w-full px-6 py-3 bg-gold text-midnight-950 rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-gold transition-all font-semibold text-center shadow-md hover:shadow-lg"
                 >
                   Search
                 </Link>

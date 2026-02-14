@@ -47,11 +47,42 @@ function useDebounce(value, delay) {
 function Home() {
   const { toggleShortlist, isShortlisted } = useShortlist();
   const scrollContainerRef = useRef(null);
+  const morePropertiesRef = useRef(null);
+  const [carouselScroll, setCarouselScroll] = useState(0);
+  
+  // Budget range mapping
+  const budgetRanges = {
+    '': { min: '', max: '' },
+    '2000000': { min: 0, max: 2000000 },
+    '4000000': { min: 2000000, max: 4000000 },
+    '6000000': { min: 4000000, max: 6000000 },
+    '10000000': { min: 6000000, max: 10000000 },
+    '20000000': { min: 10000000, max: 20000000 },
+    '50000000': { min: 20000000, max: 50000000 },
+    '999999999': { min: 50000000, max: 999999999 },
+  };
+  
   const [filters, setFilters] = useState({
     city: '',
     property_type: '',
     budget: '',
   });
+
+  // Handle carousel scroll
+  const scrollCarousel = (direction) => {
+    if (morePropertiesRef.current) {
+      const scrollAmount = 400; // Scroll distance in pixels
+      const currentScroll = morePropertiesRef.current.scrollLeft;
+      const targetScroll = direction === 'left' 
+        ? currentScroll - scrollAmount 
+        : currentScroll + scrollAmount;
+      
+      morePropertiesRef.current.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Typewriter effect for hero title
   const heroText = 'Invest in Curated Luxury Real Estate Through Transparent Bidding';
@@ -61,11 +92,15 @@ function Home() {
   const debouncedCity = useDebounce(filters.city, 500);
 
   // Create query filters object with debounced values
-  const queryFilters = useMemo(() => ({
-    city: debouncedCity,
-    property_type: filters.property_type,
-    max_price: filters.budget ? parseInt(filters.budget) : '',
-  }), [debouncedCity, filters.property_type, filters.budget]);
+  const queryFilters = useMemo(() => {
+    const budgetRange = budgetRanges[filters.budget] || budgetRanges[''];
+    return {
+      city: debouncedCity,
+      property_type: filters.property_type,
+      min_price: budgetRange.min !== '' ? budgetRange.min : '',
+      max_price: budgetRange.max !== '' ? budgetRange.max : '',
+    };
+  }, [debouncedCity, filters.property_type, filters.budget]);
 
   const { data: featuredData } = useQuery(
     ['featured-properties', queryFilters],
@@ -75,8 +110,11 @@ function Home() {
       if (queryFilters.city) params.city = queryFilters.city;
       if (queryFilters.property_type) params.property_type = queryFilters.property_type;
       // Only include numeric fields if they have actual values
-      if (queryFilters.max_price && queryFilters.max_price !== '') {
-        params.max_price = parseFloat(queryFilters.max_price);
+      if (queryFilters.min_price !== '') {
+        params.min_price = queryFilters.min_price;
+      }
+      if (queryFilters.max_price !== '') {
+        params.max_price = queryFilters.max_price;
       }
       return propertiesAPI.getAll(params);
     }
@@ -285,10 +323,24 @@ function Home() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-10 md:mb-16">More Properties</h2>
 
           {properties.length > 0 && (
-            <div className="relative">
+            <div className="relative group">
+              {/* Left Arrow Button */}
+              <button
+                onClick={() => scrollCarousel('left')}
+                className="absolute -left-6 md:-left-8 top-1/2 -translate-y-1/2 z-20 bg-gold text-midnight-950 rounded-full p-3 md:p-4 hover:bg-gold-hover transition-all shadow-lg hover:shadow-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Scroll left"
+              >
+                <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
               {/* Carousel Container */}
-              <div className="overflow-hidden">
-                <div className="flex gap-6 md:gap-8 animate-scroll">
+              <div className="overflow-hidden rounded-lg">
+                <div 
+                  ref={morePropertiesRef}
+                  className="flex gap-6 md:gap-8 overflow-x-auto scroll-smooth hide-scrollbar"
+                >
                   {/* Duplicate properties for infinite loop effect */}
                   {[...properties, ...properties].map((property, index) => {
                     const imageUrl = property.cover_image_url || 
@@ -355,9 +407,20 @@ function Home() {
                 </div>
               </div>
 
+              {/* Right Arrow Button */}
+              <button
+                onClick={() => scrollCarousel('right')}
+                className="absolute -right-6 md:-right-8 top-1/2 -translate-y-1/2 z-20 bg-gold text-midnight-950 rounded-full p-3 md:p-4 hover:bg-gold-hover transition-all shadow-lg hover:shadow-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Scroll right"
+              >
+                <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
               {/* Gradient Overlays */}
-              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-midnight-950 to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-midnight-950 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-midnight-950 to-transparent z-10 pointer-events-none rounded-lg"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-midnight-950 to-transparent z-10 pointer-events-none rounded-lg"></div>
             </div>
           )}
         </div>

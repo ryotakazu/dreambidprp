@@ -27,6 +27,18 @@ function Properties() {
   const location = useLocation();
   const { toggleShortlist, isShortlisted } = useShortlist();
   
+  // Budget range mapping
+  const budgetRanges = {
+    '': { min: '', max: '' },
+    '2000000': { min: 0, max: 2000000 },
+    '4000000': { min: 2000000, max: 4000000 },
+    '6000000': { min: 4000000, max: 6000000 },
+    '10000000': { min: 6000000, max: 10000000 },
+    '20000000': { min: 10000000, max: 20000000 },
+    '50000000': { min: 20000000, max: 50000000 },
+    '999999999': { min: 50000000, max: 999999999 },
+  };
+
   // Initialize filters from location state if available
   const initialFilters = location.state?.filters || {
     city: '',
@@ -43,11 +55,15 @@ function Properties() {
   const debouncedCity = useDebounce(filters.city, 500);
 
   // Create query filters object with debounced values
-  const queryFilters = useMemo(() => ({
-    city: debouncedCity,
-    property_type: filters.property_type,
-    max_price: filters.budget ? parseInt(filters.budget) : '',
-  }), [debouncedCity, filters.property_type, filters.budget]);
+  const queryFilters = useMemo(() => {
+    const budgetRange = budgetRanges[filters.budget] || budgetRanges[''];
+    return {
+      city: debouncedCity,
+      property_type: filters.property_type,
+      min_price: budgetRange.min !== '' ? budgetRange.min : '',
+      max_price: budgetRange.max !== '' ? budgetRange.max : '',
+    };
+  }, [debouncedCity, filters.property_type, filters.budget]);
 
   const { data, isLoading, error } = useQuery(
     ['properties', queryFilters, page, sortBy],
@@ -55,7 +71,8 @@ function Properties() {
       const params = { page, limit, sort_by: sortBy };
       if (queryFilters.city) params.city = queryFilters.city;
       if (queryFilters.property_type) params.property_type = queryFilters.property_type;
-      if (queryFilters.max_price) params.max_price = queryFilters.max_price;
+      if (queryFilters.min_price !== '') params.min_price = queryFilters.min_price;
+      if (queryFilters.max_price !== '') params.max_price = queryFilters.max_price;
       return propertiesAPI.getAll(params);
     }
   );

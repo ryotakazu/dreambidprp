@@ -147,13 +147,13 @@ function Home() {
                   style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23CBA135' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '36px'}}
                 >
                   <option value="">- Select from dropdown -</option>
-                  <option value="0">Under 20L</option>
-                  <option value="2000000">20-40L</option>
-                  <option value="4000000">40-60L</option>
-                  <option value="6000000">60L-1Cr</option>
-                  <option value="10000000">1-2Cr</option>
-                  <option value="20000000">2-5Cr</option>
-                  <option value="50000000">Above 5Cr</option>
+                  <option value="2000000">Under 20L</option>
+                  <option value="4000000">20-40L</option>
+                  <option value="6000000">40-60L</option>
+                  <option value="10000000">60L-1Cr</option>
+                  <option value="20000000">1-2Cr</option>
+                  <option value="50000000">2-5Cr</option>
+                  <option value="999999999">Above 5Cr</option>
                 </select>
               </div>
 

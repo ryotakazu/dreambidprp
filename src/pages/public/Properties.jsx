@@ -137,13 +137,13 @@ function Properties() {
                 className="w-full px-4 py-3 bg-midnight-800 border border-midnight-700 text-text-primary rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
               >
                 <option value="" className="bg-midnight-800 text-text-primary">Select</option>
-                <option value="0" className="bg-midnight-800 text-text-primary">Under 20 Lakhs</option>
-                <option value="2000000" className="bg-midnight-800 text-text-primary">20-40 Lakhs</option>
-                <option value="4000000" className="bg-midnight-800 text-text-primary">40-60 Lakhs</option>
-                <option value="6000000" className="bg-midnight-800 text-text-primary">60 Lakhs - 1 Crore</option>
-                <option value="10000000" className="bg-midnight-800 text-text-primary">1-2 Crores</option>
-                <option value="20000000" className="bg-midnight-800 text-text-primary">2-5 Crores</option>
-                <option value="50000000" className="bg-midnight-800 text-text-primary">Above 5 Crores</option>
+                <option value="2000000" className="bg-midnight-800 text-text-primary">Under 20 Lakhs</option>
+                <option value="4000000" className="bg-midnight-800 text-text-primary">20-40 Lakhs</option>
+                <option value="6000000" className="bg-midnight-800 text-text-primary">40-60 Lakhs</option>
+                <option value="10000000" className="bg-midnight-800 text-text-primary">60 Lakhs - 1 Crore</option>
+                <option value="20000000" className="bg-midnight-800 text-text-primary">1-2 Crores</option>
+                <option value="50000000" className="bg-midnight-800 text-text-primary">2-5 Crores</option>
+                <option value="999999999" className="bg-midnight-800 text-text-primary">Above 5 Crores</option>
               </select>
             </div>
 

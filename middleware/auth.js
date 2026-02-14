@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import pool from '../config/database.js';
 
-// Verify JWT token
+// Verify JWT token and attach user info to request
 const authenticate = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -10,7 +10,7 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ message: 'No token provided, authorization denied' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
     // Get user from database
     const result = await pool.query(
@@ -26,7 +26,11 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ message: 'User account is inactive' });
     }
 
+    // Attach user info to request for use in route handlers
     req.user = result.rows[0];
+    req.userId = result.rows[0].id;
+    req.token = token;
+    
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
@@ -54,5 +58,30 @@ const authorize = (...roles) => {
   };
 };
 
-export { authenticate, authorize };
+// Optional authentication (doesn't fail if token is missing)
+const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      const result = await pool.query(
+        'SELECT id, email, full_name, role, is_active FROM users WHERE id = $1',
+        [decoded.userId]
+      );
+
+      if (result.rows.length > 0 && result.rows[0].is_active) {
+        req.user = result.rows[0];
+        req.userId = result.rows[0].id;
+        req.token = token;
+      }
+    }
+  } catch (error) {
+    // Silently ignore auth errors for optional auth
+  }
+  
+  next();
+};
+
+export { authenticate, authorize, optionalAuth };
 

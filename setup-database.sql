@@ -96,6 +96,24 @@ CREATE INDEX idx_property_interests_user_id ON property_interests(user_id);
 CREATE INDEX idx_property_interests_type ON property_interests(interest_type);
 CREATE INDEX idx_users_email ON users(email);
 
+-- Create User Activity Tracking table
+CREATE TABLE IF NOT EXISTS user_activity (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  action VARCHAR(100) NOT NULL,
+  action_category VARCHAR(50),
+  data JSONB DEFAULT NULL,
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for user_activity table for performance
+CREATE INDEX idx_user_activity_user_id ON user_activity(user_id);
+CREATE INDEX idx_user_activity_created_at ON user_activity(created_at);
+CREATE INDEX idx_user_activity_action ON user_activity(action);
+CREATE INDEX idx_user_activity_user_date ON user_activity(user_id, created_at DESC);
+
 -- Insert a sample admin user (password: admin123 - plain text for development)
 -- Note: In production, create users through the API with bcrypt hashing
 INSERT INTO users (email, password_hash, full_name, role, is_active)

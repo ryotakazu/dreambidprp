@@ -7,9 +7,11 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import pool from './config/database.js';
+import CleanupService from './services/CleanupService.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
+import activityRoutes from './routes/activity.js';
 import propertyRoutes from './routes/properties.js';
 import enquiryRoutes from './routes/enquiries.js';
 import interestRoutes from './routes/interests.js';
@@ -107,8 +109,12 @@ async function initializeDatabase() {
 // Initialize database before starting server
 await initializeDatabase();
 
+// Initialize cleanup service (scheduled jobs)
+CleanupService.initSchedules();
+
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/activity', activityRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/interests', interestRoutes);

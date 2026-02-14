@@ -9,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
+// Request interceptor - Add JWT token to all requests
 api.interceptors.request.use(
   (config) => {
     // Add token if available
@@ -24,7 +24,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor - Handle auth errors globally
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -33,19 +33,46 @@ api.interceptors.response.use(
     // Handle common errors
     if (error.response?.status === 401) {
       // Token expired or invalid
+      console.warn('Unauthorized: token may be expired or invalid');
       localStorage.removeItem('token');
-      window.location.href = '/admin/login';
+      
+      // Redirect to login if not already on login page
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/admin/login';
+      }
     }
     
+    if (error.response?.status === 403) {
+      console.warn('Access Forbidden: insufficient permissions');
+    }
+
     return Promise.reject(error);
   }
 );
 
-// API endpoints
+// Auth API endpoints
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
   getMe: () => api.get('/auth/me'),
+  logout: () => api.post('/auth/logout'),
+  changePassword: (data) => api.post('/auth/change-password', data),
+  verifyToken: () => api.post('/auth/verify'),
+};
+
+// Activity API endpoints
+export const activityAPI = {
+  saveActivity: (data) => api.post('/activity/save', data),
+  getUserActivity: (userId, limit = 50, offset = 0) =>
+    api.get(`/activity/user/${userId}`, { params: { limit, offset } }),
+  getUserStats: (userId, daysBack = 30) =>
+    api.get(`/activity/stats/user/${userId}`, { params: { daysBack } }),
+  getAllActivities: (limit = 50, offset = 0) =>
+    api.get('/activity/all', { params: { limit, offset } }),
+  getActivitiesByCategory: (category, limit = 50, offset = 0) =>
+    api.get(`/activity/category/${category}`, { params: { limit, offset } }),
+  getActivityStats: (daysBack = 30) =>
+    api.get('/activity/stats', { params: { daysBack } }),
 };
 
 export const propertiesAPI = {

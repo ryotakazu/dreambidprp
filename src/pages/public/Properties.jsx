@@ -46,7 +46,7 @@ function Properties() {
   const queryFilters = useMemo(() => ({
     city: debouncedCity,
     property_type: filters.property_type,
-    min_price: filters.budget ? parseInt(filters.budget) : '',
+    max_price: filters.budget ? parseInt(filters.budget) : '',
   }), [debouncedCity, filters.property_type, filters.budget]);
 
   const { data, isLoading, error } = useQuery(
@@ -55,7 +55,7 @@ function Properties() {
       const params = { page, limit, sort_by: sortBy };
       if (queryFilters.city) params.city = queryFilters.city;
       if (queryFilters.property_type) params.property_type = queryFilters.property_type;
-      if (queryFilters.min_price) params.min_price = queryFilters.min_price;
+      if (queryFilters.max_price) params.max_price = queryFilters.max_price;
       return propertiesAPI.getAll(params);
     }
   );
@@ -182,7 +182,10 @@ function Properties() {
                 <span className="text-sm text-text-nav font-medium">Sort By</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => {
+                    setSortBy(e.target.value);
+                    setPage(1);
+                  }}
                   className="px-3 py-2 bg-midnight-800 border border-midnight-700 rounded-input text-sm focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition text-text-primary"
                 >
                   <option value="auction_date" className="bg-midnight-800 text-text-primary">Auctions Closing Soon</option>

@@ -64,7 +64,7 @@ function Home() {
   const queryFilters = useMemo(() => ({
     city: debouncedCity,
     property_type: filters.property_type,
-    min_price: filters.budget ? parseInt(filters.budget) : '',
+    max_price: filters.budget ? parseInt(filters.budget) : '',
   }), [debouncedCity, filters.property_type, filters.budget]);
 
   const { data: featuredData } = useQuery(
@@ -75,8 +75,8 @@ function Home() {
       if (queryFilters.city) params.city = queryFilters.city;
       if (queryFilters.property_type) params.property_type = queryFilters.property_type;
       // Only include numeric fields if they have actual values
-      if (queryFilters.min_price && queryFilters.min_price !== '') {
-        params.min_price = parseFloat(queryFilters.min_price);
+      if (queryFilters.max_price && queryFilters.max_price !== '') {
+        params.max_price = parseFloat(queryFilters.max_price);
       }
       return propertiesAPI.getAll(params);
     }
@@ -279,34 +279,26 @@ function Home() {
         </div>
       </div>
 
-      {/* More Properties Section by City */}
+      {/* More Properties Section - Horizontal Carousel */}
       <div className="bg-gradient-to-b from-midnight-950 to-midnight-900 px-4 md:px-8 py-12 md:py-24">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-10 md:mb-16">More Properties</h2>
 
           {properties.length > 0 && (
-            <div className="space-y-12">
-              {/* Properties grouped by city */}
-              {(() => {
-                const citiesMap = {};
-                properties.forEach(prop => {
-                  const city = prop.city || 'Other';
-                  if (!citiesMap[city]) citiesMap[city] = [];
-                  citiesMap[city].push(prop);
-                });
-                
-                return Object.entries(citiesMap).map(([city, cityProperties]) => (
-                  <div key={city} className="group">
-                    <h3 className="text-2xl md:text-3xl font-bold text-gold mb-6">Properties in {city}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-                      {cityProperties.slice(0, 3).map((property) => {
-                        const imageUrl = property.cover_image_url || 
-                          (property.images && property.images.length > 0 
-                            ? (typeof property.images[0] === 'object' ? property.images[0].image_url : property.images[0])
-                            : null);
+            <div className="relative">
+              {/* Carousel Container */}
+              <div className="overflow-hidden">
+                <div className="flex gap-6 md:gap-8 animate-scroll">
+                  {/* Duplicate properties for infinite loop effect */}
+                  {[...properties, ...properties].map((property, index) => {
+                    const imageUrl = property.cover_image_url || 
+                      (property.images && property.images.length > 0 
+                        ? (typeof property.images[0] === 'object' ? property.images[0].image_url : property.images[0])
+                        : null);
 
-                        return (
-                        <div key={property.id} className="card overflow-hidden hover:shadow-2xl transition-all duration-300">
+                    return (
+                      <div key={`${property.id}-${index}`} className="flex-shrink-0 w-80 md:w-96">
+                        <div className="card overflow-hidden hover:shadow-2xl transition-all duration-300 h-full flex flex-col">
                           <div className="relative h-48 md:h-56 overflow-hidden bg-midnight-800">
                             {imageUrl ? (
                               <img
@@ -332,12 +324,12 @@ function Home() {
                               </span>
                             </div>
                           </div>
-                          <div className="p-4 md:p-6">
+                          <div className="p-4 md:p-6 flex-grow flex flex-col">
                             <h3 className="text-lg md:text-xl font-bold text-white mb-2 line-clamp-2">{property.title}</h3>
                             <p className="text-text-secondary text-xs md:text-sm mb-3">
                               📍 {property.city}, {property.state} • {property.property_size} sq.ft
                             </p>
-                            <p className="text-lg md:text-2xl font-bold text-gold mb-4">₹{parseFloat(property.reserve_price).toLocaleString('en-IN')}</p>
+                            <p className="text-lg md:text-2xl font-bold text-gold mb-4 flex-grow">₹{parseFloat(property.reserve_price).toLocaleString('en-IN')}</p>
                             <div className="flex gap-2 md:gap-3 pt-4 md:pt-6 border-t border-midnight-700">
                               <Link
                                 to={`/properties/${property.id}`}
@@ -357,12 +349,15 @@ function Home() {
                             </div>
                           </div>
                         </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ));
-              })()}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Gradient Overlays */}
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-midnight-950 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-midnight-950 to-transparent z-10 pointer-events-none"></div>
             </div>
           )}
         </div>

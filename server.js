@@ -27,8 +27,9 @@ const PORT = process.env.PORT || 5000;
 
 // CORS Configuration
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://dreambid.netlify.app',
+  process.env.FRONTEND_URL || 'https://dreambid-new.netlify.app',
   'https://dreambid.netlify.app',
+  'https://dreambid-new.netlify.app',
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5174',

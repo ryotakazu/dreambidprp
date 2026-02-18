@@ -26,6 +26,16 @@ class CleanupService {
       try {
         console.log(`[${new Date().toISOString()}] ⏰ Running activity cleanup job...`);
 
+        // Check if table exists first
+        const tableExists = await pool.query(
+          "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity')"
+        );
+
+        if (!tableExists.rows[0].exists) {
+          console.log('⚠️  user_activity table does not exist, skipping cleanup');
+          return;
+        }
+
         const result = await pool.query(
           `DELETE FROM user_activity 
            WHERE created_at < NOW() - INTERVAL '3 months'
@@ -102,6 +112,16 @@ class CleanupService {
     try {
       console.log(`🧹 Running manual activity cleanup (older than ${daysOld} days)...`);
 
+      // Check if table exists first
+      const tableExists = await pool.query(
+        "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity')"
+      );
+
+      if (!tableExists.rows[0].exists) {
+        console.log('⚠️  user_activity table does not exist, cannot perform cleanup');
+        return 0;
+      }
+
       const result = await pool.query(
         `DELETE FROM user_activity 
          WHERE created_at < NOW() - INTERVAL '${daysOld} days'
@@ -123,6 +143,21 @@ class CleanupService {
    */
   static async getCleanupStats(daysOld = 90) {
     try {
+      // Check if table exists first
+      const tableExists = await pool.query(
+        "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity')"
+      );
+
+      if (!tableExists.rows[0].exists) {
+        console.log('⚠️  user_activity table does not exist');
+        return {
+          total_records: 0,
+          affected_users: 0,
+          oldest_record: null,
+          newest_record: null
+        };
+      }
+
       const result = await pool.query(
         `SELECT 
           COUNT(*) as total_records,

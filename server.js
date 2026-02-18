@@ -90,6 +90,34 @@ async function initializeDatabase() {
     } else {
       console.log('✅ Database tables already exist');
       
+      // Check if user_activity table exists and create if missing
+      const userActivityCheck = await pool.query(
+        "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity')"
+      );
+      
+      if (!userActivityCheck.rows[0].exists) {
+        console.log('📝 Creating user_activity table (missing from existing database)...');
+        
+        await pool.query(`
+          CREATE TABLE user_activity (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            action VARCHAR(100) NOT NULL,
+            action_category VARCHAR(50),
+            data JSONB DEFAULT NULL,
+            ip_address VARCHAR(45),
+            user_agent TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          );
+          
+          CREATE INDEX idx_user_activity_user_id ON user_activity(user_id);
+          CREATE INDEX idx_user_activity_created_at ON user_activity(created_at);
+          CREATE INDEX idx_user_activity_action ON user_activity(action);
+          CREATE INDEX idx_user_activity_user_date ON user_activity(user_id, created_at DESC);
+        `);
+        console.log('✅ user_activity table created');
+      }
+      
       // Ensure admin user exists with correct hashed password
       try {
         // Bcrypt hash for password 'admin123'

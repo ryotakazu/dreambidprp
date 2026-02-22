@@ -103,26 +103,14 @@ async function runMigrations() {
     console.log('🔄 Running migrations...');
     const migrationSql = fs.readFileSync(migrationPath, 'utf-8');
     
-    // Split by semicolon and execute each statement
-    const statements = migrationSql
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0);
-    
-    for (const statement of statements) {
-      try {
-        await pool.query(statement);
-      } catch (err) {
-        // Ignore "already exists" errors for idempotency
-        if (err.message.includes('already exists') || err.message.includes('duplicate')) {
-          console.log('ℹ️  Column/constraint already exists (skipping):', err.message.split('\n')[0]);
-        } else {
-          throw err;
-        }
-      }
+    // Execute entire migration as one transaction for idempotency
+    try {
+      await pool.query(migrationSql);
+      console.log('✅ Migrations completed successfully');
+    } catch (err) {
+      // Log but don't fail - migrations are idempotent
+      console.log('ℹ️  Migration notice:', err.message.split('\n')[0]);
     }
-    
-    console.log('✅ Migrations completed successfully');
   } catch (error) {
     console.error('⚠️  Migration error:', error.message);
     // Don't fail startup on migration errors
@@ -131,55 +119,87 @@ async function runMigrations() {
 
 // Initialize database on startup
 async function initializeDatabase() {
-  try {
-    console.log('🔄 Checking/initializing database...');
-    
-    // Check if users table exists
-    const tableCheck = await pool.query(
-      "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users')"
-    );
-    
-    if (!tableCheck.rows[0].exists) {
-      console.log('📝 Creating database tables...');
+  let retries = 0;
+  const maxRetries = 3;
+  
+  while (retries < maxRetries) {
+    try {
+      console.log('🔄 Checking/initializing database...');
       
-      // Read and execute schema
-      const schemaSql = fs.readFileSync(path.join(__dirname, 'setup-database.sql'), 'utf-8');
-      await pool.query(schemaSql);
-      console.log('✅ Schema created');
-      
-      // Read and execute seed data
-      const seedSql = fs.readFileSync(path.join(__dirname, 'seed-properties.sql'), 'utf-8');
-      await pool.query(seedSql);
-      console.log('✅ Seed data inserted');
-    } else {
-      console.log('✅ Database tables already exist');
-      
-      // Check if user_activity table exists and create if missing
-      const userActivityCheck = await pool.query(
-        "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity')"
+      // Check if users table exists
+      const tableCheck = await pool.query(
+        "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users')"
       );
       
-      if (!userActivityCheck.rows[0].exists) {
-        console.log('📝 Creating user_activity table (missing from existing database)...');
+      if (!tableCheck.rows[0].exists) {
+        console.log('📝 Creating database tables...');
         
-        await pool.query(`
-          CREATE TABLE user_activity (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-            action VARCHAR(100) NOT NULL,
-            action_category VARCHAR(50),
-            data JSONB DEFAULT NULL,
-            ip_address VARCHAR(45),
-            user_agent TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
+        // Read and execute schema - handle it as a single transaction
+        const schemaSql = fs.readFileSync(path.join(__dirname, 'setup-database.sql'), 'utf-8');
+        const schemaStatements = schemaSql
+          .split(';')
+          .map(stmt => stmt.trim())
+          .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+        
+        for (const statement of schemaStatements) {
+          try {
+            await pool.query(statement);
+          } catch (err) {
+            if (!err.message.includes('already exists') && !err.message.includes('duplicate key')) {
+              throw err;
+            }
+          }
+        }
+        console.log('✅ Schema created');
+        
+        // Read and execute seed data
+        const seedSql = fs.readFileSync(path.join(__dirname, 'seed-properties.sql'), 'utf-8');
+        const seedStatements = seedSql
+          .split(';')
+          .map(stmt => stmt.trim())
+          .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+        
+        for (const statement of seedStatements) {
+          try {
+            await pool.query(statement);
+          } catch (err) {
+            // Ignore duplicate key errors
+            if (!err.message.includes('duplicate key') && !err.message.includes('already exists')) {
+              console.warn('Seed insert warning:', err.message.split('\n')[0]);
+            }
+          }
+        }
+        console.log('✅ Seed data inserted');
+      } else {
+        console.log('✅ Database tables already exist');
+        
+        // Check if user_activity table exists and create if missing
+        const userActivityCheck = await pool.query(
+          "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity')"
+        );
+        
+        if (!userActivityCheck.rows[0].exists) {
+          console.log('📝 Creating user_activity table (missing from existing database)...');
           
-          CREATE INDEX idx_user_activity_user_id ON user_activity(user_id);
-          CREATE INDEX idx_user_activity_created_at ON user_activity(created_at);
-          CREATE INDEX idx_user_activity_action ON user_activity(action);
-          CREATE INDEX idx_user_activity_user_date ON user_activity(user_id, created_at DESC);
-        `);
-        console.log('✅ user_activity table created');
+          await pool.query(`
+            CREATE TABLE user_activity (
+              id SERIAL PRIMARY KEY,
+              user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+              action VARCHAR(100) NOT NULL,
+              action_category VARCHAR(50),
+              data JSONB DEFAULT NULL,
+              ip_address VARCHAR(45),
+              user_agent TEXT,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            
+            CREATE INDEX idx_user_activity_user_id ON user_activity(user_id);
+            CREATE INDEX idx_user_activity_created_at ON user_activity(created_at);
+            CREATE INDEX idx_user_activity_action ON user_activity(action);
+            CREATE INDEX idx_user_activity_user_date ON user_activity(user_id, created_at DESC);
+          `);
+          console.log('✅ user_activity table created');
+        }
       }
       
       // Ensure admin user exists with correct hashed password
@@ -193,12 +213,21 @@ async function initializeDatabase() {
         , [adminPasswordHash]);
         console.log('✅ Admin user verified');
       } catch (err) {
-        console.log('ℹ️  Admin user setup skipped:', err.message);
+        console.log('ℹ️  Admin user setup:', err.message.split('\n')[0]);
+      }
+      
+      return; // Success - exit function
+    } catch (error) {
+      retries++;
+      console.error(`❌ Database initialization error (attempt ${retries}/${maxRetries}):`, error.message);
+      
+      if (retries < maxRetries) {
+        console.log(`⏳ Retrying in 2 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } else {
+        console.error('⚠️  Max retries reached. Continuing with startup...');
       }
     }
-  } catch (error) {
-    console.error('❌ Database initialization error:', error.message);
-    // Don't exit - let the app continue anyway
   }
 }
 

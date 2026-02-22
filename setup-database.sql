@@ -42,6 +42,13 @@ CREATE TABLE IF NOT EXISTS properties (
   views_count INTEGER DEFAULT 0,
   shares_count INTEGER DEFAULT 0,
   enquiries_count INTEGER DEFAULT 0,
+  estimated_market_value DECIMAL(15, 2),
+  built_up_area DECIMAL(10, 2),
+  total_area DECIMAL(10, 2),
+  emd DECIMAL(15, 2),
+  possession_type VARCHAR(100),
+  application_end_date TIMESTAMP,
+  auction_time TIME,
   created_by INTEGER REFERENCES users(id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

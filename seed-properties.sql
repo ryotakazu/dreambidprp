@@ -1,3 +1,6 @@
+-- Temporarily disable foreign key constraints for seeding
+SET session_replication_role = 'replica';
+
 -- Insert sample properties with cover images and new fields
 INSERT INTO properties (title, description, property_type, address, city, state, zip_code, country, latitude, longitude, area_sqft, bedrooms, bathrooms, floors, reserve_price, auction_date, auction_status, cover_image_url, created_by, is_featured, estimated_market_value, built_up_area, total_area, emd, possession_type, application_end_date, auction_time) VALUES ('Modern Luxury Villa in Mumbai', 'A stunning 5-bedroom villa in the heart of Mumbai with premium amenities, swimming pool, and garden.', 'villa', '123 Palm Avenue', 'Mumbai', 'Maharashtra', '400001', 'India', 19.0760, 72.8777, 5000, 5, 3, 2, 5000000, '2026-02-15 10:00:00', 'upcoming', 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80', 1, true, 6500000, 4500, 5500, 500000, 'Physical', '2026-02-10 23:59:59', '10:00:00');
 INSERT INTO properties (title, description, property_type, address, city, state, zip_code, country, latitude, longitude, area_sqft, bedrooms, bathrooms, floors, reserve_price, auction_date, auction_status, cover_image_url, created_by, is_featured, estimated_market_value, built_up_area, total_area, emd, possession_type, application_end_date, auction_time) VALUES ('Spacious Apartment in Bangalore', 'Well-maintained 3-bedroom apartment in a prime location with modern furnishing and all facilities.', 'apartment', '456 Tech Park', 'Bangalore', 'Karnataka', '560001', 'India', 12.9716, 77.5946, 2500, 3, 2, 20, 3500000, '2026-02-20 14:30:00', 'active', 'https://images.unsplash.com/photo-1545324418-cc1a9a6fded0?w=800&q=80', 1, true, 4200000, 2300, 2800, 350000, 'Physical', '2026-02-18 23:59:59', '14:30:00');
@@ -50,3 +53,6 @@ INSERT INTO property_images (property_id, image_url, image_order) VALUES (12, 'h
 INSERT INTO property_images (property_id, image_url, image_order) VALUES (13, 'https://images.unsplash.com/photo-1545324418-cc1a9a6fded0?w=800&q=80', 0);
 INSERT INTO property_images (property_id, image_url, image_order) VALUES (13, 'https://images.unsplash.com/photo-1494145904049-0dca59b4bbad?w=800&q=80', 1);
 INSERT INTO property_images (property_id, image_url, image_order) VALUES (13, 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', 2);
+
+-- Re-enable foreign key constraints
+SET session_replication_role = 'origin';

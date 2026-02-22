@@ -153,23 +153,30 @@ async function initializeDatabase() {
         console.log('✅ Schema created');
         
         // Read and execute seed data
+        console.log('📝 Seeding database with sample properties...');
         const seedSql = fs.readFileSync(path.join(__dirname, 'seed-properties.sql'), 'utf-8');
         const seedStatements = seedSql
           .split(';')
           .map(stmt => stmt.trim())
           .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
         
+        let seedSuccess = 0;
+        let seedSkipped = 0;
+        
         for (const statement of seedStatements) {
           try {
             await pool.query(statement);
+            seedSuccess++;
           } catch (err) {
-            // Ignore duplicate key errors
-            if (!err.message.includes('duplicate key') && !err.message.includes('already exists')) {
-              console.warn('Seed insert warning:', err.message.split('\n')[0]);
+            // Ignore duplicate key errors (already seeded)
+            if (err.message.includes('duplicate key') || err.message.includes('already exists')) {
+              seedSkipped++;
+            } else {
+              console.warn('⚠️  Seed warning:', err.message.split('\n')[0]);
             }
           }
         }
-        console.log('✅ Seed data inserted');
+        console.log(`✅ Seed data completed: ${seedSuccess} inserted, ${seedSkipped} skipped`);
       } else {
         console.log('✅ Database tables already exist');
         

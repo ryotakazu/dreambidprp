@@ -5,6 +5,7 @@ import { propertiesAPI, interestsAPI } from '../../services/api';
 import { shareProperty } from '../../utils/whatsapp';
 import { getImageUrl } from '../../utils/imageUrl';
 import { useShortlist } from '../../contexts/ShortlistContext';
+import PropertyTypeDropdown from '../../components/PropertyTypeDropdown';
 
 // Custom hook for debouncing
 function useDebounce(value, delay) {
@@ -42,7 +43,7 @@ function Properties() {
   // Initialize filters from location state if available
   const initialFilters = location.state?.filters || {
     city: '',
-    property_type: '',
+    property_type: [],
     budget: '',
   };
   
@@ -59,7 +60,9 @@ function Properties() {
     const budgetRange = budgetRanges[filters.budget] || budgetRanges[''];
     return {
       city: debouncedCity,
-      property_type: filters.property_type,
+      property_type: filters.property_type && filters.property_type.length > 0 
+        ? filters.property_type.join(',') 
+        : '',
       min_price: budgetRange.min !== '' ? budgetRange.min : '',
       max_price: budgetRange.max !== '' ? budgetRange.max : '',
     };
@@ -118,29 +121,21 @@ function Properties() {
                   type="text"
                   value={filters.city}
                   onChange={(e) => handleFilterChange('city', e.target.value)}
-                  placeholder="Search location"
+                  placeholder="e.g. Delhi, Noida, Gurugram"
                   className="w-full pl-10 pr-4 py-3 bg-midnight-800 border border-midnight-700 text-text-primary placeholder-text-muted rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
                 />
               </div>
             </div>
 
-            {/* Property Type */}
+            {/* Property Type Multi-Select */}
             <div>
               <label className="label block mb-2">
                 Property Type
               </label>
-              <select
+              <PropertyTypeDropdown
                 value={filters.property_type}
-                onChange={(e) => handleFilterChange('property_type', e.target.value)}
-                className="w-full px-4 py-3 bg-midnight-800 border border-midnight-700 text-text-primary rounded-input focus:ring-2 focus:ring-gold focus:border-transparent outline-none transition"
-              >
-                <option value="" className="bg-midnight-800 text-text-primary">Select</option>
-                <option value="house" className="bg-midnight-800 text-text-primary">House</option>
-                <option value="apartment" className="bg-midnight-800 text-text-primary">Apartment</option>
-                <option value="land" className="bg-midnight-800 text-text-primary">Land</option>
-                <option value="commercial" className="bg-midnight-800 text-text-primary">Commercial</option>
-                <option value="villa" className="bg-midnight-800 text-text-primary">Villa</option>
-              </select>
+                onChange={(newValue) => handleFilterChange('property_type', newValue)}
+              />
             </div>
 
             {/* Budget */}
@@ -195,7 +190,7 @@ function Properties() {
               <div className="text-center py-12 card">
                 <p className="text-text-secondary text-lg">No properties found matching your criteria.</p>
                 <button
-                  onClick={() => setFilters({ city: '', property_type: '', budget: '' })}
+                  onClick={() => setFilters({ city: '', property_type: [], budget: '' })}
                   className="mt-4 px-4 py-2 bg-gold text-midnight-950 rounded-btn hover:bg-gold-hover transition text-sm font-medium"
                 >
                   Clear Filters

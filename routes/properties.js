@@ -116,15 +116,39 @@ router.get('/', [
     }
 
     if (city) {
-      paramCount++;
-      query += ` AND city ILIKE $${paramCount}`;
-      params.push(`%${city}%`);
+      // Handle multiple cities separated by comma
+      const cities = city.split(',').map(c => c.trim()).filter(c => c);
+      if (cities.length > 0) {
+        if (cities.length === 1) {
+          paramCount++;
+          query += ` AND city ILIKE $${paramCount}`;
+          params.push(`%${cities[0]}%`);
+        } else {
+          // Multiple cities - use OR conditions
+          const cityConditions = cities.map((_, idx) => `city ILIKE $${paramCount + idx + 1}`).join(' OR ');
+          query += ` AND (${cityConditions})`;
+          cities.forEach(c => params.push(`%${c}%`));
+          paramCount += cities.length;
+        }
+      }
     }
 
     if (property_type) {
-      paramCount++;
-      query += ` AND property_type = $${paramCount}`;
-      params.push(property_type);
+      // Handle multiple property types separated by comma
+      const types = property_type.split(',').map(t => t.trim()).filter(t => t);
+      if (types.length > 0) {
+        if (types.length === 1) {
+          paramCount++;
+          query += ` AND property_type = $${paramCount}`;
+          params.push(types[0]);
+        } else {
+          // Multiple types - use IN clause
+          const placeholders = types.map((_, idx) => `$${paramCount + idx + 1}`).join(',');
+          query += ` AND property_type IN (${placeholders})`;
+          types.forEach(type => params.push(type));
+          paramCount += types.length;
+        }
+      }
     }
 
     if (min_price) {

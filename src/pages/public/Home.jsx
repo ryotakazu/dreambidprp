@@ -6,6 +6,7 @@ import { propertiesAPI } from '../../services/api';
 import { shareProperty } from '../../utils/whatsapp';
 import { getImageUrl } from '../../utils/imageUrl';
 import { useShortlist } from '../../contexts/ShortlistContext';
+import PropertyTypeDropdown from '../../components/PropertyTypeDropdown';
 
 // Custom hook for debouncing
 function useDebounce(value, delay) {
@@ -27,6 +28,8 @@ function useDebounce(value, delay) {
 function Home() {
   const { toggleShortlist, isShortlisted } = useShortlist();
   const scrollContainerRef = useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const totalSlides = 8; // We have 8 steps
   const morePropertiesRef = useRef(null);
   const citiesCarouselRef = useRef(null);
   const [carouselScroll, setCarouselScroll] = useState(0);
@@ -46,7 +49,7 @@ function Home() {
   
   const [filters, setFilters] = useState({
     city: '',
-    property_type: '',
+    property_type: [],
     budget: '',
   });
 
@@ -77,7 +80,9 @@ function Home() {
     const budgetRange = budgetRanges[filters.budget] || budgetRanges[''];
     return {
       city: debouncedCity,
-      property_type: filters.property_type,
+      property_type: filters.property_type && filters.property_type.length > 0 
+        ? filters.property_type.join(',') 
+        : '',
       min_price: budgetRange.min !== '' ? budgetRange.min : '',
       max_price: budgetRange.max !== '' ? budgetRange.max : '',
     };
@@ -101,7 +106,17 @@ function Home() {
     }
   );
 
-  const properties = featuredData?.data?.properties || [];
+  // Fallback query for general properties when featured is empty
+  const { data: fallbackData } = useQuery(
+    ['fallback-properties'],
+    () => {
+      return propertiesAPI.getAll({ limit: 6 });
+    }
+  );
+
+  const properties = featuredData?.data?.properties && featuredData.data.properties.length > 0 
+    ? featuredData.data.properties 
+    : fallbackData?.data?.properties || [];
 
   // Define cities data
   const citiesData = [
@@ -144,6 +159,55 @@ function Home() {
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  // Handle carousel navigation
+  const handlePrevSlide = () => {
+    const newSlide = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
+    setCurrentSlide(newSlide);
+    
+    if (scrollContainerRef?.current) {
+      // Calculate card width based on screen size
+      let cardWidth;
+      const containerWidth = scrollContainerRef.current.offsetWidth;
+      
+      if (window.innerWidth < 768) {
+        // Mobile: card should be full container width
+        cardWidth = containerWidth;
+      } else {
+        // Desktop: fixed card widths
+        cardWidth = 320; // md:w-80
+      }
+      
+      scrollContainerRef.current.scrollBy({ 
+        left: -(cardWidth + 24), // 24px is the gap
+        behavior: 'smooth' 
+      });
+    }
+  };
+
+  const handleNextSlide = () => {
+    const newSlide = currentSlide === totalSlides - 1 ? 0 : currentSlide + 1;
+    setCurrentSlide(newSlide);
+    
+    if (scrollContainerRef?.current) {
+      // Calculate card width based on screen size
+      let cardWidth;
+      const containerWidth = scrollContainerRef.current.offsetWidth;
+      
+      if (window.innerWidth < 768) {
+        // Mobile: card should be full container width
+        cardWidth = containerWidth;
+      } else {
+        // Desktop: fixed card widths
+        cardWidth = 320; // md:w-80
+      }
+      
+      scrollContainerRef.current.scrollBy({ 
+        left: cardWidth + 24, // 24px is the gap
+        behavior: 'smooth' 
+      });
+    }
   };
 
   return (
@@ -189,7 +253,7 @@ function Home() {
                   type="text"
                   value={filters.city}
                   onChange={(e) => handleFilterChange('city', e.target.value)}
-                  placeholder="Enter location"
+                  placeholder="e.g. Delhi, Noida, Gurugram"
                   className="w-full px-4 py-3 bg-midnight-800 border-b-2 border-midnight-700 text-text-primary placeholder-text-muted text-sm focus:outline-none focus:border-gold transition"
                 />
               </div>
@@ -214,22 +278,13 @@ function Home() {
                 </select>
               </div>
 
-              {/* Property Type Dropdown */}
+              {/* Property Type Multi-Select */}
               <div className="border-b md:border-b-0 md:border-r border-midnight-700 p-6">
                 <label className="block text-xs font-semibold text-text-soft uppercase tracking-wide mb-3">Property Type</label>
-                <select
+                <PropertyTypeDropdown
                   value={filters.property_type}
-                  onChange={(e) => handleFilterChange('property_type', e.target.value)}
-                  className="w-full px-4 py-3 bg-midnight-800 border-b-2 border-midnight-700 text-text-primary text-sm focus:outline-none focus:border-gold transition appearance-none cursor-pointer"
-                  style={{backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23CBA135' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '36px'}}
-                >
-                  <option value="">- Select from dropdown -</option>
-                  <option value="house">House</option>
-                  <option value="apartment">Apartment</option>
-                  <option value="land">Land</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="villa">Villa</option>
-                </select>
+                  onChange={(newValue) => handleFilterChange('property_type', newValue)}
+                />
               </div>
 
               {/* Search Button */}
@@ -600,7 +655,7 @@ function Home() {
               style={{ scrollBehavior: 'smooth' }}
             >
               {/* Step 1 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-midnight-950">01</span>
@@ -614,7 +669,7 @@ function Home() {
               </div>
 
               {/* Step 2 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-white">02</span>
@@ -628,7 +683,7 @@ function Home() {
               </div>
 
               {/* Step 3 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-white">03</span>
@@ -642,7 +697,7 @@ function Home() {
               </div>
 
               {/* Step 4 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-white">04</span>
@@ -656,7 +711,7 @@ function Home() {
               </div>
 
               {/* Step 5 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-white">05</span>
@@ -670,7 +725,7 @@ function Home() {
               </div>
 
               {/* Step 6 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-midnight-950">06</span>
@@ -684,7 +739,7 @@ function Home() {
               </div>
 
               {/* Step 7 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-white">07</span>
@@ -698,7 +753,7 @@ function Home() {
               </div>
 
               {/* Step 8 */}
-              <div className="flex-shrink-0 w-full md:w-1/4 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-72 bg-gradient-to-br from-midnight-800 to-midnight-750 rounded-lg p-6 border border-midnight-700">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xl font-bold text-white">08</span>
@@ -710,16 +765,15 @@ function Home() {
                 <h3 className="text-lg font-bold text-text-primary mb-2">Register the Property</h3>
                 <p className="text-text-secondary text-sm">Authorized officer registers the property in the Sub-Registrar Office.</p>
               </div>
+
+              {/* Spacer for proper scroll padding */}
+              <div className="flex-shrink-0 w-8"></div>
             </div>
 
             {/* Navigation Arrows */}
             <div className="flex justify-center gap-4 mt-8">
               <button
-                onClick={() => {
-                  if (scrollContainerRef?.current) {
-                    scrollContainerRef.current.scrollBy({ left: -400, behavior: 'smooth' });
-                  }
-                }}
+                onClick={handlePrevSlide}
                 className="w-12 h-12 rounded-full border-2 border-midnight-600 flex items-center justify-center hover:border-gold hover:bg-midnight-800 transition-all"
               >
                 <svg className="w-6 h-6 text-midnight-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -727,11 +781,7 @@ function Home() {
                 </svg>
               </button>
               <button
-                onClick={() => {
-                  if (scrollContainerRef?.current) {
-                    scrollContainerRef.current.scrollBy({ left: 400, behavior: 'smooth' });
-                  }
-                }}
+                onClick={handleNextSlide}
                 className="w-12 h-12 rounded-full border-2 border-midnight-600 flex items-center justify-center hover:border-gold hover:bg-midnight-800 transition-all"
               >
                 <svg className="w-6 h-6 text-midnight-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
